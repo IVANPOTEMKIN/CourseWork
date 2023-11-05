@@ -6,6 +6,7 @@ import pro.sky.coursework.service.ValidationCheckService;
 
 @Service
 public class ValidationCheckServiceImpl implements ValidationCheckService {
+
     @Override
     public boolean validate(Question question) {
         return question != null

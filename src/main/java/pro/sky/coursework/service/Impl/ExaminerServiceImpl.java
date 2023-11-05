@@ -23,9 +23,11 @@ public class ExaminerServiceImpl implements ExaminerService {
     @Override
     public Collection<Question> getQuestions(int amount) {
         int size = service.getAll().size();
+
         if (size < amount) {
             throw new QuestionLimitException();
         }
+
         Set<Question> questions = new HashSet<>();
 
         while (questions.size() < amount) {
