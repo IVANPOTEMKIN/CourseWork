@@ -2,6 +2,7 @@ package pro.sky.coursework.service.Impl;
 
 import org.springframework.stereotype.Service;
 import pro.sky.coursework.domain.Question;
+import pro.sky.coursework.exception.QuestionAlreadyAddedException;
 import pro.sky.coursework.exception.QuestionInvalideException;
 import pro.sky.coursework.exception.QuestionNotFoundException;
 import pro.sky.coursework.service.QuestionService;
@@ -44,8 +45,11 @@ public class JavaQuestionService implements QuestionService {
     @Override
     public Question add(Question question) {
         if (validation.validate(question)) {
-            questions.add(question);
-            return question;
+            if (!checkQuestionAdded(questions, question)) {
+                questions.add(question);
+                return question;
+            }
+            throw new QuestionAlreadyAddedException();
         }
         throw new QuestionInvalideException();
     }
@@ -72,5 +76,14 @@ public class JavaQuestionService implements QuestionService {
         List<Question> list = List.copyOf(questions);
         int value = random.nextInt(getAll().size());
         return list.get(value);
+    }
+
+    private static boolean checkQuestionAdded(Collection<Question> collection, Question question) {
+        for (Question el : collection) {
+            if (collection.contains(question)
+                    || el.getQuestion().equalsIgnoreCase(question.getQuestion()))
+                return true;
+        }
+        return false;
     }
 }
