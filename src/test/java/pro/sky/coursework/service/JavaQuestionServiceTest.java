@@ -1,6 +1,13 @@
 package pro.sky.coursework.service;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import pro.sky.coursework.domain.Question;
 import pro.sky.coursework.exception.QuestionAlreadyAddedException;
@@ -9,13 +16,36 @@ import pro.sky.coursework.exception.QuestionNotFoundException;
 import pro.sky.coursework.service.Impl.JavaQuestionService;
 
 import java.util.Collection;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static pro.sky.coursework.service.utils.QuestionExamples.*;
 
+@ExtendWith(MockitoExtension.class)
 class JavaQuestionServiceTest {
 
-    private final JavaQuestionService questionService = new JavaQuestionService();
+    @Mock
+    private ValidationCheckService validationService;
+    @InjectMocks
+    private JavaQuestionService questionService;
+
+    public static Stream<Arguments> provideParamsForTests_1() {
+        return Stream.of(
+                Arguments.of(EXAMPLE_1),
+                Arguments.of(new Question(EXAMPLE_1.getQuestion(), "0"))
+        );
+    }
+
+    public static Stream<Arguments> provideParamsForTests_2() {
+        return Stream.of(
+                Arguments.of((Object) null),
+                Arguments.of(new Question(null, EXAMPLE_1.getAnswer())),
+                Arguments.of(new Question(EXAMPLE_1.getQuestion(), null)),
+                Arguments.of(new Question(" ", EXAMPLE_1.getAnswer())),
+                Arguments.of(new Question(EXAMPLE_1.getQuestion(), " ")),
+                Arguments.of(new Question("1", "1"))
+        );
+    }
 
     @Test
     void add_1_success() {
@@ -31,67 +61,32 @@ class JavaQuestionServiceTest {
         assertEquals(EXAMPLE_0, actual);
     }
 
-    @Test
-    void add_2_QuestionInvalideException() {
+    @ParameterizedTest
+    @MethodSource("provideParamsForTests_2")
+    void add_2_QuestionInvalideException(Question question) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         String expected = status.value() + " <b>Некорректный запрос!</b>";
 
-        Exception actual_1 = assertThrows(
+        Exception actual = assertThrows(
                 QuestionInvalideException.class,
-                () -> questionService.add(null)
+                () -> validationService.validate(questionService.add(question))
         );
 
-        Exception actual_2 = assertThrows(
-                QuestionInvalideException.class,
-                () -> questionService.add(null, EXAMPLE_1.getAnswer())
-        );
-
-        Exception actual_3 = assertThrows(
-                QuestionInvalideException.class,
-                () -> questionService.add(EXAMPLE_1.getQuestion(), null)
-        );
-
-
-        Exception actual_4 = assertThrows(
-                QuestionInvalideException.class,
-                () -> questionService.add(" ", EXAMPLE_1.getAnswer())
-        );
-
-        Exception actual_5 = assertThrows(
-                QuestionInvalideException.class,
-                () -> questionService.add(EXAMPLE_1.getQuestion(), " ")
-        );
-
-        Exception actual_6 = assertThrows(
-                QuestionInvalideException.class,
-                () -> questionService.add("1", "1")
-        );
-
-        assertEquals(expected, actual_1.getMessage());
-        assertEquals(expected, actual_2.getMessage());
-        assertEquals(expected, actual_3.getMessage());
-        assertEquals(expected, actual_4.getMessage());
-        assertEquals(expected, actual_5.getMessage());
-        assertEquals(expected, actual_6.getMessage());
+        assertEquals(expected, actual.getMessage());
     }
 
-    @Test
-    void add_2_QuestionAlreadyAddedException() {
+    @ParameterizedTest
+    @MethodSource("provideParamsForTests_1")
+    void add_2_QuestionAlreadyAddedException(Question question) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         String expected = status.value() + " <b>Данный вопрос уже был добавлен!</b>";
 
-        Exception actual_1 = assertThrows(
+        Exception actual = assertThrows(
                 QuestionAlreadyAddedException.class,
-                () -> questionService.add(EXAMPLE_1)
+                () -> questionService.add(question)
         );
 
-        Exception actual_2 = assertThrows(
-                QuestionAlreadyAddedException.class,
-                () -> questionService.add(EXAMPLE_1.getQuestion(), "0")
-        );
-
-        assertEquals(expected, actual_1.getMessage());
-        assertEquals(expected, actual_2.getMessage());
+        assertEquals(expected, actual.getMessage());
     }
 
     @Test
@@ -116,48 +111,18 @@ class JavaQuestionServiceTest {
         assertEquals(expected, actual.getMessage());
     }
 
-    @Test
-    void remove_QuestionInvalideException() {
+    @ParameterizedTest
+    @MethodSource("provideParamsForTests_2")
+    void remove_QuestionInvalideException(Question question) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         String expected = status.value() + " <b>Некорректный запрос!</b>";
 
-        Exception actual_1 = assertThrows(
+        Exception actual = assertThrows(
                 QuestionInvalideException.class,
-                () -> questionService.remove(null)
+                () -> validationService.validate(questionService.remove(question))
         );
 
-        Exception actual_2 = assertThrows(
-                QuestionInvalideException.class,
-                () -> questionService.remove(new Question(null, EXAMPLE_1.getAnswer()))
-        );
-
-        Exception actual_3 = assertThrows(
-                QuestionInvalideException.class,
-                () -> questionService.remove(new Question(EXAMPLE_1.getQuestion(), null))
-        );
-
-
-        Exception actual_4 = assertThrows(
-                QuestionInvalideException.class,
-                () -> questionService.remove(new Question(" ", EXAMPLE_1.getAnswer()))
-        );
-
-        Exception actual_5 = assertThrows(
-                QuestionInvalideException.class,
-                () -> questionService.remove(new Question(EXAMPLE_1.getQuestion(), " "))
-        );
-
-        Exception actual_6 = assertThrows(
-                QuestionInvalideException.class,
-                () -> questionService.remove(new Question("1", "1"))
-        );
-
-        assertEquals(expected, actual_1.getMessage());
-        assertEquals(expected, actual_2.getMessage());
-        assertEquals(expected, actual_3.getMessage());
-        assertEquals(expected, actual_4.getMessage());
-        assertEquals(expected, actual_5.getMessage());
-        assertEquals(expected, actual_6.getMessage());
+        assertEquals(expected, actual.getMessage());
     }
 
     @Test

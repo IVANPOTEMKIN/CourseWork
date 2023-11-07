@@ -8,7 +8,6 @@ import pro.sky.coursework.service.ExaminerService;
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/get")
 public class ExamController {
 
     private final ExaminerService service;
@@ -22,7 +21,7 @@ public class ExamController {
         return String.format("Code: %S. Error: %S", e.getStatusCode(), e.getMessage());
     }
 
-    @GetMapping
+    @GetMapping("/get")
     public Collection<Question> getQuestion(@RequestParam int amount) {
         return service.getQuestions(amount);
     }

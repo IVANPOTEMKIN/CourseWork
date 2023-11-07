@@ -1,8 +1,16 @@
 package pro.sky.coursework.service;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.http.HttpStatus;
 import pro.sky.coursework.domain.Question;
+import pro.sky.coursework.exception.QuestionInvalideException;
 import pro.sky.coursework.service.Impl.ValidationCheckServiceImpl;
+
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static pro.sky.coursework.service.utils.QuestionExamples.*;
@@ -11,22 +19,34 @@ class ValidationCheckServiceImplTest {
 
     private final ValidationCheckService service = new ValidationCheckServiceImpl();
 
+    public static Stream<Arguments> provideParamsForTests() {
+        return Stream.of(
+                Arguments.of((Object) null),
+                Arguments.of(new Question(null, EXAMPLE_1.getAnswer())),
+                Arguments.of(new Question(EXAMPLE_1.getQuestion(), null)),
+                Arguments.of(new Question(" ", EXAMPLE_1.getAnswer())),
+                Arguments.of(new Question(EXAMPLE_1.getQuestion(), " ")),
+                Arguments.of(new Question("1", "1"))
+        );
+    }
+
     @Test
     void validate_success() {
-        boolean expected = false;
+        boolean actual = service.validate(EXAMPLE_1);
+        assertTrue(actual);
+    }
 
-        boolean actual_1 = service.validate(null);
-        boolean actual_2 = service.validate(new Question(null, EXAMPLE_1.getAnswer()));
-        boolean actual_3 = service.validate(new Question(EXAMPLE_1.getQuestion(), null));
-        boolean actual_4 = service.validate(new Question(" ", EXAMPLE_1.getAnswer()));
-        boolean actual_5 = service.validate(new Question(EXAMPLE_1.getQuestion(), " "));
-        boolean actual_6 = service.validate(new Question("1", "1"));
+    @ParameterizedTest
+    @MethodSource("provideParamsForTests")
+    void validate_QuestionInvalideException(Question question) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String expected = status.value() + " <b>Некорректный запрос!</b>";
 
-        assertEquals(expected, actual_1);
-        assertEquals(expected, actual_2);
-        assertEquals(expected, actual_3);
-        assertEquals(expected, actual_4);
-        assertEquals(expected, actual_5);
-        assertEquals(expected, actual_6);
+        Exception actual = assertThrows(
+                QuestionInvalideException.class,
+                () -> service.validate(question)
+        );
+
+        assertEquals(expected, actual.getMessage());
     }
 }

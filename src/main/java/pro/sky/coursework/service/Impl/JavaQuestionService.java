@@ -3,7 +3,6 @@ package pro.sky.coursework.service.Impl;
 import org.springframework.stereotype.Service;
 import pro.sky.coursework.domain.Question;
 import pro.sky.coursework.exception.QuestionAlreadyAddedException;
-import pro.sky.coursework.exception.QuestionInvalideException;
 import pro.sky.coursework.exception.QuestionNotFoundException;
 import pro.sky.coursework.service.QuestionService;
 import pro.sky.coursework.service.ValidationCheckService;
@@ -44,26 +43,24 @@ public class JavaQuestionService implements QuestionService {
 
     @Override
     public Question add(Question question) {
-        if (validation.validate(question)) {
-            if (!checkQuestionAdded(questions, question)) {
-                questions.add(question);
-                return question;
-            }
-            throw new QuestionAlreadyAddedException();
+        validation.validate(question);
+
+        if (!checkQuestionAdded(questions, question)) {
+            questions.add(question);
+            return question;
         }
-        throw new QuestionInvalideException();
+        throw new QuestionAlreadyAddedException();
     }
 
     @Override
     public Question remove(Question question) {
-        if (validation.validate(question)) {
-            if (questions.contains(question)) {
-                questions.remove(question);
-                return question;
-            }
-            throw new QuestionNotFoundException();
+        validation.validate(question);
+
+        if (questions.contains(question)) {
+            questions.remove(question);
+            return question;
         }
-        throw new QuestionInvalideException();
+        throw new QuestionNotFoundException();
     }
 
     @Override
