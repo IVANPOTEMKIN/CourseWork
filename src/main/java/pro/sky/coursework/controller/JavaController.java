@@ -11,10 +11,10 @@ import java.util.Collection;
 @RequestMapping("/java")
 public class JavaController {
 
-    private final QuestionService service;
+    private final QuestionService questionService;
 
-    public JavaController(QuestionService service) {
-        this.service = service;
+    public JavaController(QuestionService questionService) {
+        this.questionService = questionService;
     }
 
     @ExceptionHandler
@@ -24,18 +24,18 @@ public class JavaController {
 
     @GetMapping
     public Collection<Question> getQuestion() {
-        return service.getAll();
+        return questionService.getAll();
     }
 
     @GetMapping("/add")
     public Question addQuestion(@RequestParam String question,
                                 @RequestParam String answer) {
-        return service.add(question, answer);
+        return questionService.add(question, answer);
     }
 
     @GetMapping("/remove")
     public Question removeQuestion(@RequestParam String question,
                                    @RequestParam String answer) {
-        return service.remove(new Question(question, answer));
+        return questionService.remove(new Question(question, answer));
     }
 }

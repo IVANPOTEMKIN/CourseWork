@@ -14,12 +14,12 @@ public class JavaQuestionService implements QuestionService {
 
     private final Random random;
     private final Set<Question> questions;
-    private final ValidationCheckService validation;
+    private final ValidationCheckService validationCheckService;
 
-    public JavaQuestionService() {
+    public JavaQuestionService(ValidationCheckService validationCheckService) {
         this.random = new Random();
         this.questions = new HashSet<>();
-        this.validation = new ValidationCheckServiceImpl();
+        this.validationCheckService = validationCheckService;
 
         Question question_1 = new Question("1*1", "1");
         Question question_2 = new Question("2*2", "4");
@@ -43,7 +43,7 @@ public class JavaQuestionService implements QuestionService {
 
     @Override
     public Question add(Question question) {
-        validation.validate(question);
+        validationCheckService.validate(question);
 
         if (!checkQuestionAdded(questions, question)) {
             questions.add(question);
@@ -54,7 +54,7 @@ public class JavaQuestionService implements QuestionService {
 
     @Override
     public Question remove(Question question) {
-        validation.validate(question);
+        validationCheckService.validate(question);
 
         if (questions.contains(question)) {
             questions.remove(question);

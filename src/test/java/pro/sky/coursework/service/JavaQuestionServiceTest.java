@@ -19,31 +19,22 @@ import java.util.Collection;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static pro.sky.coursework.service.utils.QuestionExamples.*;
 
 @ExtendWith(MockitoExtension.class)
 class JavaQuestionServiceTest {
 
     @Mock
-    private ValidationCheckService validationService;
+    private ValidationCheckService validationCheckService;
     @InjectMocks
     private JavaQuestionService questionService;
 
-    public static Stream<Arguments> provideParamsForTests_1() {
+    public static Stream<Arguments> provideParamsForTests() {
         return Stream.of(
                 Arguments.of(EXAMPLE_1),
                 Arguments.of(new Question(EXAMPLE_1.getQuestion(), "0"))
-        );
-    }
-
-    public static Stream<Arguments> provideParamsForTests_2() {
-        return Stream.of(
-                Arguments.of((Object) null),
-                Arguments.of(new Question(null, EXAMPLE_1.getAnswer())),
-                Arguments.of(new Question(EXAMPLE_1.getQuestion(), null)),
-                Arguments.of(new Question(" ", EXAMPLE_1.getAnswer())),
-                Arguments.of(new Question(EXAMPLE_1.getQuestion(), " ")),
-                Arguments.of(new Question("1", "1"))
         );
     }
 
@@ -61,22 +52,15 @@ class JavaQuestionServiceTest {
         assertEquals(EXAMPLE_0, actual);
     }
 
-    @ParameterizedTest
-    @MethodSource("provideParamsForTests_2")
-    void add_2_QuestionInvalideException(Question question) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        String expected = status.value() + " <b>Некорректный запрос!</b>";
+    @Test()
+    void add_2_QuestionInvalideException() {
+        when(validationCheckService.validate(any())).thenThrow(QuestionInvalideException.class);
 
-        Exception actual = assertThrows(
-                QuestionInvalideException.class,
-                () -> validationService.validate(questionService.add(question))
-        );
-
-        assertEquals(expected, actual.getMessage());
+        assertThrows(QuestionInvalideException.class, () -> questionService.add(EXAMPLE_1));
     }
 
     @ParameterizedTest
-    @MethodSource("provideParamsForTests_1")
+    @MethodSource("provideParamsForTests")
     void add_2_QuestionAlreadyAddedException(Question question) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         String expected = status.value() + " <b>Данный вопрос уже был добавлен!</b>";
@@ -111,18 +95,11 @@ class JavaQuestionServiceTest {
         assertEquals(expected, actual.getMessage());
     }
 
-    @ParameterizedTest
-    @MethodSource("provideParamsForTests_2")
-    void remove_QuestionInvalideException(Question question) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        String expected = status.value() + " <b>Некорректный запрос!</b>";
+    @Test
+    void remove_QuestionInvalideException() {
+        when(validationCheckService.validate(any())).thenThrow(QuestionInvalideException.class);
 
-        Exception actual = assertThrows(
-                QuestionInvalideException.class,
-                () -> validationService.validate(questionService.remove(question))
-        );
-
-        assertEquals(expected, actual.getMessage());
+        assertThrows(QuestionInvalideException.class, () -> questionService.remove(EXAMPLE_1));
     }
 
     @Test

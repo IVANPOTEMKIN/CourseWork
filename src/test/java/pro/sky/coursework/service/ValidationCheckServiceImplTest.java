@@ -17,7 +17,7 @@ import static pro.sky.coursework.service.utils.QuestionExamples.*;
 
 class ValidationCheckServiceImplTest {
 
-    private final ValidationCheckService service = new ValidationCheckServiceImpl();
+    private final ValidationCheckService validationCheckService = new ValidationCheckServiceImpl();
 
     public static Stream<Arguments> provideParamsForTests() {
         return Stream.of(
@@ -32,7 +32,8 @@ class ValidationCheckServiceImplTest {
 
     @Test
     void validate_success() {
-        boolean actual = service.validate(EXAMPLE_1);
+        boolean actual = validationCheckService.validate(EXAMPLE_1);
+
         assertTrue(actual);
     }
 
@@ -44,7 +45,7 @@ class ValidationCheckServiceImplTest {
 
         Exception actual = assertThrows(
                 QuestionInvalideException.class,
-                () -> service.validate(question)
+                () -> validationCheckService.validate(question)
         );
 
         assertEquals(expected, actual.getMessage());

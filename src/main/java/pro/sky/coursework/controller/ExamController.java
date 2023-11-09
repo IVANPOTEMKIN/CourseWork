@@ -10,10 +10,10 @@ import java.util.Collection;
 @RestController
 public class ExamController {
 
-    private final ExaminerService service;
+    private final ExaminerService examinerService;
 
-    public ExamController(ExaminerService service) {
-        this.service = service;
+    public ExamController(ExaminerService examinerService) {
+        this.examinerService = examinerService;
     }
 
     @ExceptionHandler
@@ -23,6 +23,6 @@ public class ExamController {
 
     @GetMapping("/get")
     public Collection<Question> getQuestion(@RequestParam int amount) {
-        return service.getQuestions(amount);
+        return examinerService.getQuestions(amount);
     }
 }

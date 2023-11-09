@@ -14,15 +14,15 @@ import java.util.Set;
 @Service
 public class ExaminerServiceImpl implements ExaminerService {
 
-    private final QuestionService service;
+    private final QuestionService questionService;
 
     public ExaminerServiceImpl(QuestionService service) {
-        this.service = service;
+        this.questionService = service;
     }
 
     @Override
     public Collection<Question> getQuestions(int amount) {
-        int size = service.getAll().size();
+        int size = questionService.getAll().size();
 
         if (size < amount) {
             throw new QuestionLimitException();
@@ -31,7 +31,7 @@ public class ExaminerServiceImpl implements ExaminerService {
         Set<Question> questions = new HashSet<>();
 
         while (questions.size() < amount) {
-            questions.add(service.getRandomQuestion());
+            questions.add(questionService.getRandomQuestion());
         }
         return Collections.unmodifiableCollection(questions);
     }
