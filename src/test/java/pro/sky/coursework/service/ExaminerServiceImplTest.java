@@ -10,25 +10,30 @@ import pro.sky.coursework.domain.Question;
 import pro.sky.coursework.exception.QuestionLimitException;
 import pro.sky.coursework.service.Impl.ExaminerServiceImpl;
 import pro.sky.coursework.service.Impl.JavaQuestionService;
+import pro.sky.coursework.service.Impl.MathQuestionService;
 
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static pro.sky.coursework.service.utils.QuestionExamples.*;
+import static pro.sky.coursework.utils.ExamplesForJavaTests.*;
+import static pro.sky.coursework.utils.ExamplesForMathTests.*;
 
 @ExtendWith(MockitoExtension.class)
 class ExaminerServiceImplTest {
 
     @Mock
-    private JavaQuestionService questionService;
+    private JavaQuestionService javaService;
+    @Mock
+    private MathQuestionService mathService;
     @InjectMocks
-    private ExaminerServiceImpl examinerService;
+    private ExaminerServiceImpl service;
 
     @Test
     void getQuestions_success() {
-        Collection<Question> actual = examinerService.getQuestions(questionService.getAll().size());
+        Collection<Question> actual = service.getQuestions(javaService.getAll().size() + mathService.getAll().size());
 
-        assertTrue(getCollection().containsAll(actual));
+        assertTrue(getCollectionJava().containsAll(actual));
+        assertTrue(getCollectionMath().containsAll(actual));
     }
 
     @Test
@@ -38,7 +43,7 @@ class ExaminerServiceImplTest {
 
         Exception actual = assertThrows(
                 QuestionLimitException.class,
-                () -> examinerService.getQuestions(Integer.MAX_VALUE)
+                () -> service.getQuestions(Integer.MAX_VALUE)
         );
 
         assertEquals(expected, actual.getMessage());

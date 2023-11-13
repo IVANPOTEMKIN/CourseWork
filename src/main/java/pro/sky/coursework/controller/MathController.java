@@ -9,12 +9,12 @@ import pro.sky.coursework.service.QuestionService;
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/java")
-public class JavaController {
+@RequestMapping("/math")
+public class MathController {
 
     private final QuestionService service;
 
-    public JavaController(@Qualifier("javaService") QuestionService service) {
+    public MathController(@Qualifier("mathService") QuestionService service) {
         this.service = service;
     }
 

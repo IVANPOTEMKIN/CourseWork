@@ -1,38 +1,46 @@
 package pro.sky.coursework.service.Impl;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import pro.sky.coursework.domain.Question;
 import pro.sky.coursework.exception.QuestionLimitException;
 import pro.sky.coursework.service.ExaminerService;
 import pro.sky.coursework.service.QuestionService;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ExaminerServiceImpl implements ExaminerService {
 
-    private final QuestionService questionService;
+    private final QuestionService javaQuestionService;
+    private final QuestionService mathQuestionService;
+    private final Random random;
 
-    public ExaminerServiceImpl(QuestionService service) {
-        this.questionService = service;
+    public ExaminerServiceImpl(@Qualifier("javaService") QuestionService javaQuestionService,
+                               @Qualifier("mathService") QuestionService mathQuestionService
+    ) {
+        this.javaQuestionService = javaQuestionService;
+        this.mathQuestionService = mathQuestionService;
+        this.random = new Random();
     }
 
     @Override
     public Collection<Question> getQuestions(int amount) {
-        int size = questionService.getAll().size();
+        int size = javaQuestionService.getAll().size() + mathQuestionService.getAll().size();
 
-        if (size < amount) {
-            throw new QuestionLimitException();
+        if (size >= amount) {
+            Collection<Question> questions = new HashSet<>();
+
+            while (questions.size() < amount) {
+
+                if (random.nextBoolean()) {
+                    questions.add(javaQuestionService.getRandomQuestion());
+                } else {
+                    questions.add(mathQuestionService.getRandomQuestion());
+                }
+            }
+            return Collections.unmodifiableCollection(questions);
         }
-
-        Set<Question> questions = new HashSet<>();
-
-        while (questions.size() < amount) {
-            questions.add(questionService.getRandomQuestion());
-        }
-        return Collections.unmodifiableCollection(questions);
+        throw new QuestionLimitException();
     }
 }

@@ -3,7 +3,6 @@ package pro.sky.coursework.domain;
 import java.util.Objects;
 
 public class Question {
-
     private final String question;
     private final String answer;
 
@@ -25,12 +24,19 @@ public class Question {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         Question question1 = (Question) object;
-        return Objects.equals(question, question1.question)
-                && Objects.equals(answer, question1.answer);
+        return Objects.equals(question, question1.question) && Objects.equals(answer, question1.answer);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(question, answer);
+    }
+
+    @Override
+    public String toString() {
+        return "Question{" +
+                "question='" + question + '\'' +
+                ", answer='" + answer + '\'' +
+                '}';
     }
 }

@@ -10,19 +10,19 @@ import java.util.Collection;
 @RestController
 public class ExamController {
 
-    private final ExaminerService examinerService;
+    private final ExaminerService service;
 
-    public ExamController(ExaminerService examinerService) {
-        this.examinerService = examinerService;
+    public ExamController(ExaminerService service) {
+        this.service = service;
     }
 
     @ExceptionHandler
-    public String handleException(HttpStatusCodeException e) {
-        return String.format("Code: %S. Error: %S", e.getStatusCode(), e.getMessage());
+    private String handleException(HttpStatusCodeException e) {
+        return String.format("Code: <b>%S</b>. Error: %S", e.getStatusCode(), e.getStatusText());
     }
 
-    @GetMapping("/get")
-    public Collection<Question> getQuestion(@RequestParam int amount) {
-        return examinerService.getQuestions(amount);
+    @GetMapping("/get/{amount}")
+    public Collection<Question> getQuestions(@PathVariable int amount) {
+        return service.getQuestions(amount);
     }
 }

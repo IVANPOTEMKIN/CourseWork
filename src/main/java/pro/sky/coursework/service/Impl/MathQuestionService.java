@@ -10,13 +10,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
-@Service("javaService")
-public class JavaQuestionService implements QuestionService {
+@Service("mathService")
+public class MathQuestionService implements QuestionService {
 
     private final QuestionRepository repository;
     private final Random random;
 
-    public JavaQuestionService(@Qualifier("javaRep") QuestionRepository repository) {
+    public MathQuestionService(@Qualifier("mathRep") QuestionRepository repository) {
         this.repository = repository;
         this.random = new Random();
     }
